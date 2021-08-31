@@ -50,7 +50,6 @@ public class MonederoConsumer {
 
                         //REVISAR SI TIENE DEBITO ASOCIADA
 
-
                         // SI NO TIENE -> RECHAZAR PETICION
                         monederoTransactionDto.setStatus(MonederoTransactionDto.Status.REJECTED);
                     }

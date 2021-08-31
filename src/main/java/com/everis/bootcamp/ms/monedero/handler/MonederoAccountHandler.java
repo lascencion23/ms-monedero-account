@@ -1,8 +1,11 @@
 package com.everis.bootcamp.ms.monedero.handler;
 
+import com.everis.bootcamp.ms.monedero.domain.dto.MaestrasDto;
 import com.everis.bootcamp.ms.monedero.domain.dto.MonederoAccountDto;
 import com.everis.bootcamp.ms.monedero.domain.entity.MonederoAccount;
+import com.everis.bootcamp.ms.monedero.redis.MonederoRedisService;
 import com.everis.bootcamp.ms.monedero.service.srv.MonederoAccountService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
 @Component
+@Slf4j
 public class MonederoAccountHandler {
 
     @Autowired
@@ -27,6 +31,9 @@ public class MonederoAccountHandler {
 
     @Autowired
     private Validator validator;
+
+    @Autowired
+    private MonederoRedisService serviceRedis;
 
     public Mono<ServerResponse> findAll(ServerRequest request) {
         return ServerResponse.ok()
@@ -70,7 +77,19 @@ public class MonederoAccountHandler {
             }
 
         });
+    }
 
+    public Mono<ServerResponse> putRedis(ServerRequest request) {
+
+        return request.bodyToMono(MaestrasDto.class)
+                .flatMap(c -> serviceRedis.put(c))
+                .flatMap(d -> ServerResponse.status(HttpStatus.CREATED).build());
+    }
+
+    public Mono<ServerResponse> getRedisAll(ServerRequest request) {
+        return  ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(serviceRedis.getAll(), MaestrasDto.class);
     }
 
 }
